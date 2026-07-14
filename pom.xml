@@ -39,6 +39,16 @@
                 <version>3.14.0</version>
                 <configuration>
                     <release>25</release>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>info.picocli</groupId>
+                            <artifactId>picocli-codegen</artifactId>
+                            <version>4.7.7</version>
+                        </path>
+                    </annotationProcessorPaths>
+                    <compilerArgs>
+                        <arg>-Aproject=${project.groupId}/${project.artifactId}</arg>
+                    </compilerArgs>
                 </configuration>
             </plugin>
 

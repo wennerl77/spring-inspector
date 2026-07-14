@@ -11,6 +11,10 @@ public class ProjectScanner {
     Set<String> blackList = Set.of("target/");
 
     public List<Path> scanProject (Path root) throws IOException {
+        if (!Files.isDirectory(root)) {
+            System.err.println("Path is not a directory");
+            System.exit(1);
+        }
         if (list != null) return list;
         try (var stream = Files.walk(root)) {
             list = stream
