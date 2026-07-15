@@ -1,9 +1,11 @@
 package org.inspector;
 
 import org.inspector.core.analyzers.CodebaseAnalyzer;
+import org.inspector.core.reports.Report;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Parameters;
+import picocli.CommandLine.Option;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -13,7 +15,12 @@ import java.nio.file.Path;
 public class Main implements Runnable {
 
     @Parameters(index = "0", description = "The path the inspector will examine")
-    private String path;
+    String path;
+
+    @Option(names = {"-c", "--count"})
+    boolean count;
+
+    private final Report report = new Report();
 
     @Override
     public void run() {
@@ -38,8 +45,8 @@ public class Main implements Runnable {
                       :=========================:     \s
                        .=======================.      \s
                         .-===================-.       \s
-                        
-                     Analisando seu projeto Spring ...
+                
+                    Analisando seu projeto Spring ...
                 """);
 
         try {
@@ -47,6 +54,8 @@ public class Main implements Runnable {
         } catch (IOException ex) {
             ex.printStackTrace();
         }
+
+        if (count) report.sendReportCount();
     }
 
     public static void main(String[] args) {

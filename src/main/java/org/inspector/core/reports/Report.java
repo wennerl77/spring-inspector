@@ -14,9 +14,16 @@ public class Report {
         analyzers.add(new CountAnaliser());
     }
 
-    public void sendReport () {
+    public void sendReportCount () {
+        printLine();
+        System.out.println();
         analyzers.forEach(analyzer -> {
             analyzer.analyze().forEach(System.out::println);
         });
+        printLine();
+    }
+
+    private void printLine() {
+        System.out.println("=".repeat(50));
     }
 }

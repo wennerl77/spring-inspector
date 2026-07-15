@@ -5,7 +5,6 @@ import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import org.inspector.core.ProjectScanner;
-import org.inspector.core.reports.Report;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -14,8 +13,6 @@ import java.util.*;
 public class CodebaseAnalyzer {
 
     private final List<Path> javaClasses;
-
-    private final Report report = new Report();
 
     private static final ProjectIndex projectIndex = new ProjectIndex();
 
@@ -45,8 +42,6 @@ public class CodebaseAnalyzer {
                 throw new RuntimeException(e);
             }
         });
-
-        report.sendReport();
     }
 
     private void config() {

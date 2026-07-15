@@ -34,4 +34,8 @@ public class ProjectIndex {
     public List<ClassOrInterfaceDeclaration> getAnnotationsOfClass(String anntotation) {
         return classesByAnnotation.get(anntotation);
     }
+
+    public List<MethodMetaData> getAnnotationsOfMethod (String annotation) {
+        return methodsByAnnotation.get(annotation);
+    }
 }

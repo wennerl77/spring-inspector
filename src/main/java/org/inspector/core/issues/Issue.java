@@ -17,22 +17,30 @@ public record Issue(
     @Override
     @NonNull
     public String toString() {
-        return """
-            [%s] %s
-            Name       : %s
-            Description: %s
-            File       : %s
-            Line       : %s
-            Suggestion : %s
-            """
-                .formatted(
-                        severity,
-                        type,
-                        name,
-                        description,
-                        path != null ? path : "-",
-                        line != null ? line : "-",
-                        suggestion != null ? suggestion : "-"
-                );
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("[%s] %s%n".formatted(severity, type));
+
+        if (name != null) {
+            sb.append("Name       : ").append(name).append('\n');
+        }
+
+        if (description != null) {
+            sb.append("Description: ").append(description).append('\n');
+        }
+
+        if (path != null) {
+            sb.append("File       : ").append(path).append('\n');
+        }
+
+        if (line != null) {
+            sb.append("Line       : ").append(line).append('\n');
+        }
+
+        if (suggestion != null) {
+            sb.append("Suggestion : ").append(suggestion).append('\n');
+        }
+
+        return sb.toString().stripTrailing().concat("\n");
     }
 }
