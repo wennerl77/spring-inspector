@@ -6,23 +6,29 @@ import java.util.Optional;
 
 public class ValidateAnnotationUtil {
 
-    public static String getValueByAnnotation (String value) {
+    public static Optional<Expression> getValueByAnnotation (AnnotationExpr annotationExpr, String[] annotationValue) {
         if (annotationExpr.isMarkerAnnotationExpr()) {
             MarkerAnnotationExpr markerAnnotationExpr = annotationExpr.asMarkerAnnotationExpr();
-            return null;
+            return Optional.empty();
+
         } else if (annotationExpr.isSingleMemberAnnotationExpr()) {
             SingleMemberAnnotationExpr singleMemberAnnotationExpr = annotationExpr.asSingleMemberAnnotationExpr();
-            return singleMemberAnnotationExpr.getMemberValue().toString();
+            return Optional.of(singleMemberAnnotationExpr.getMemberValue());
+
         } else if (annotationExpr.isNormalAnnotationExpr()) {
             NormalAnnotationExpr normalAnnotationExpr = annotationExpr.asNormalAnnotationExpr();
             Optional<MemberValuePair> pair = normalAnnotationExpr.getPairs()
                     .stream()
-                    .filter(memberValuePair -> memberValuePair.getNameAsString().equals(value))
+                    .filter(memberValuePair -> {
+                        for (String ann : annotationValue) {
+                            if (memberValuePair.getNameAsString().equals(ann)) return true;
+                        }
+                        return false;
+                    })
                     .findFirst();
-
-            return pair.map(memberValuePair -> memberValuePair.getValue().toString()).orElse(null);
+            return pair.map(MemberValuePair::getValue);
         }
 
-        return null;
+        return Optional.empty();
     }
 }
