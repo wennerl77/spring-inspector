@@ -1,17 +1,20 @@
-package org.inspector.core.analyzers.controllerAnalyzer.data;
+package org.inspector.core.analyzers.data;
 
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
-import org.inspector.core.analyzers.controllerAnalyzer.MetadataAvaliable;
+import org.inspector.core.analyzers.endpoints.EndpointMetadata;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ControllerMetadata implements MetadataAvaliable{
     private ClassOrInterfaceDeclaration clazz;
+    private Path path;
     private List<EndpointMetadata> endpoints;
 
-    public ControllerMetadata(ClassOrInterfaceDeclaration clazz) {
+    public ControllerMetadata(ClassOrInterfaceDeclaration clazz, Path path) {
         this.clazz = clazz;
+        this.path = path;
         this.endpoints = new ArrayList<>();
     }
 
@@ -31,5 +34,9 @@ public class ControllerMetadata implements MetadataAvaliable{
     public boolean isAvaliable() {
         return this.clazz.isAnnotationPresent("Controller") ||
                 this.clazz.isAnnotationPresent("RestController");
+    }
+
+    public Path getPath() {
+        return path;
     }
 }

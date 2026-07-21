@@ -1,11 +1,11 @@
-package org.inspector.core.analyzers.GenericsAnalyzer;
+package org.inspector.core.analyzers.beans;
 
 import org.inspector.core.analyzers.Analyzer;
 import org.inspector.core.analyzers.CodebaseAnalyzer;
 import org.inspector.core.analyzers.ProjectIndex;
-import org.inspector.core.issues.Issue;
-import org.inspector.core.issues.BeanType;
-import org.inspector.core.issues.Severity;
+import org.inspector.core.report.Issue;
+import org.inspector.core.report.BeanType;
+import org.inspector.core.report.Severity;
 
 import java.util.List;
 import java.util.stream.Stream;

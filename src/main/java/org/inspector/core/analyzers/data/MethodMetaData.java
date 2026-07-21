@@ -1,4 +1,4 @@
-package org.inspector.core.analyzers;
+package org.inspector.core.analyzers.data;
 
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;

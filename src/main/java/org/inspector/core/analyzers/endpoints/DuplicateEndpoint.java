@@ -1,13 +1,12 @@
-    package org.inspector.core.analyzers.controllerAnalyzer.analysis;
+    package org.inspector.core.analyzers.endpoints;
 
     import org.inspector.core.analyzers.Analyzer;
     import org.inspector.core.analyzers.CodebaseAnalyzer;
-    import org.inspector.core.analyzers.controllerAnalyzer.data.ControllerMetadata;
-    import org.inspector.core.analyzers.controllerAnalyzer.data.EndpointMetadata;
-    import org.inspector.core.issues.Issue;
-    import org.inspector.core.issues.BeanType;
-    import org.inspector.core.issues.IssueType;
-    import org.inspector.core.issues.Severity;
+    import org.inspector.core.analyzers.data.ControllerMetadata;
+    import org.inspector.core.report.Issue;
+    import org.inspector.core.report.BeanType;
+    import org.inspector.core.report.IssueType;
+    import org.inspector.core.report.Severity;
 
     import java.util.*;
 

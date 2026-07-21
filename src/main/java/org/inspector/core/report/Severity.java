@@ -1,4 +1,4 @@
-package org.inspector.core.issues;
+package org.inspector.core.report;
 
 public enum Severity {
     INFO,

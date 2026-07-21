@@ -2,9 +2,10 @@ package org.inspector;
 
 import org.inspector.core.analyzers.AnalysisResult;
 import org.inspector.core.analyzers.CodebaseAnalyzer;
-import org.inspector.core.analyzers.GenericsAnalyzer.CountAnaliser;
-import org.inspector.core.analyzers.controllerAnalyzer.analysis.DuplicateEndpoint;
-import org.inspector.core.issues.Issue;
+import org.inspector.core.analyzers.beans.CountAnaliser;
+import org.inspector.core.analyzers.endpoints.DuplicateEndpoint;
+import org.inspector.core.analyzers.endpoints.MissingRequestValidation;
+import org.inspector.core.report.Issue;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Parameters;
@@ -59,6 +60,7 @@ public class Main implements Runnable {
                         .-===================-.       \s
                 
                     Analisando seu projeto Spring ...
+
                 """);
 
         try {
@@ -70,30 +72,15 @@ public class Main implements Runnable {
         Instant instantNow = Instant.now();
         if (count) analysisResult.add(new AnalysisResult("Bean Counting", (new CountAnaliser().analyze()), Duration.between(instantNow, Instant.now())));
         instantNow = Instant.now();
+        if (count) analysisResult.add(new AnalysisResult("Valid not set", (new MissingRequestValidation().analyze()), Duration.between(instantNow, Instant.now())));
+        instantNow = Instant.now();
         if (endpoint) analysisResult.add(new AnalysisResult("Duplicate Endpoints", (new DuplicateEndpoint().analyze()), Duration.between(instantNow, Instant.now())));
 
-        analysisResult.forEach(analysis -> {
-            printLine("=", 50);
-            System.out.println("\tAnalysis: " + analysis.name());
-            printLine("=", 50);
-            sendReport(analysis.issues());
-            printLine("=", 50);
-            System.out.println("\tDuration: " + analysis.duration().toMillis() + " ms");
-            printLine("=", 50);
-
-            System.out.println();
-        });
+        analysisResult.forEach(AnalysisResult::print);
     }
 
     public static void main(String[] args) {
         int exitCode = new CommandLine(new Main()).execute(args);
         System.exit(exitCode);
-    }
-
-    static void sendReport(List<Issue> issues) {
-        issues.forEach(System.out::println);
-    }
-    static void printLine(String caracter, int repeat) {
-        System.out.println(caracter.repeat(repeat));
     }
 }

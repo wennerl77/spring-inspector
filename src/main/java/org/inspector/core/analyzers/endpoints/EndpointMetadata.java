@@ -1,16 +1,19 @@
-package org.inspector.core.analyzers.controllerAnalyzer.data;
+package org.inspector.core.analyzers.endpoints;
 
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.ast.expr.AnnotationExpr;
 import com.github.javaparser.ast.expr.Expression;
-import org.inspector.core.analyzers.controllerAnalyzer.MetadataAvaliable;
-import org.inspector.core.analyzers.controllerAnalyzer.ValidateAnnotationUtil;
+import org.inspector.core.analyzers.data.ControllerMetadata;
+import org.inspector.core.analyzers.data.MetadataAvaliable;
+import org.inspector.core.analyzers.utils.ValidateAnnotationUtil;
 
 import java.util.Optional;
 import java.util.Set;
 
 public class EndpointMetadata implements MetadataAvaliable {
+
+    private ControllerMetadata owner;
     // Tipo de Endpoint
     private EndpointType httpMethod;
 
@@ -47,6 +50,10 @@ public class EndpointMetadata implements MetadataAvaliable {
         return classPath + methodPath;
     }
 
+    public ControllerMetadata getOwner() {
+        return owner;
+    }
+
     public MethodDeclaration getDeclaration() {
         return declaration;
     }
@@ -65,6 +72,10 @@ public class EndpointMetadata implements MetadataAvaliable {
 
     public void setClassPath(String classPath) {
         this.classPath = classPath.replace("\"", "");
+    }
+
+    public void setOwner(ControllerMetadata owner) {
+        this.owner = owner;
     }
 
     public String getBasicMethodInfo() {

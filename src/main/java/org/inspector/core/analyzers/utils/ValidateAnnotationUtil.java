@@ -1,4 +1,4 @@
-package org.inspector.core.analyzers.controllerAnalyzer;
+package org.inspector.core.analyzers.utils;
 
 import com.github.javaparser.ast.expr.*;
 

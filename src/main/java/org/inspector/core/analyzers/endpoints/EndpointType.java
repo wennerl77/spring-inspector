@@ -1,4 +1,4 @@
-package org.inspector.core.analyzers.controllerAnalyzer.data;
+package org.inspector.core.analyzers.endpoints;
 
 public enum EndpointType {
     GENERIC("RequestMapping"),

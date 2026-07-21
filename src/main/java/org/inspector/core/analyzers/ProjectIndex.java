@@ -3,10 +3,12 @@ package org.inspector.core.analyzers;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.expr.AnnotationExpr;
 import com.github.javaparser.ast.expr.Expression;
-import org.inspector.core.analyzers.controllerAnalyzer.ValidateAnnotationUtil;
-import org.inspector.core.analyzers.controllerAnalyzer.data.ControllerMetadata;
-import org.inspector.core.analyzers.controllerAnalyzer.data.EndpointMetadata;
+import org.inspector.core.analyzers.data.ControllerMetadata;
+import org.inspector.core.analyzers.data.MethodMetaData;
+import org.inspector.core.analyzers.endpoints.EndpointMetadata;
+import org.inspector.core.analyzers.utils.ValidateAnnotationUtil;
 
+import java.nio.file.Path;
 import java.util.*;
 
 public class ProjectIndex {
@@ -23,7 +25,9 @@ public class ProjectIndex {
         this.controllers = new HashMap<>();
     }
 
-    public void addController (String name, ControllerMetadata controllerMetadata) {
+    public void addController (String name, Path path, ClassOrInterfaceDeclaration clazz) {
+        ControllerMetadata controllerMetadata = new ControllerMetadata(clazz, path);
+
         if (controllerMetadata.isAvaliable()) {
             controllerMetadata.getClazz().getMethods().forEach(method -> {
                 EndpointMetadata pseudoEndpoint = new EndpointMetadata(method);
@@ -37,7 +41,11 @@ public class ProjectIndex {
                         );
                     }
 
-                    expression.ifPresent(value -> pseudoEndpoint.setClassPath(value.toString()));
+                    // Adiciona Endpoint
+                    expression.ifPresent(value -> {
+                        pseudoEndpoint.setClassPath(value.toString());
+                        pseudoEndpoint.setOwner(controllerMetadata);
+                    });
                     controllerMetadata.addEndpoint(pseudoEndpoint);
                 }
             });
