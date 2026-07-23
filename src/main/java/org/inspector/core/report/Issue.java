@@ -1,5 +1,6 @@
 package org.inspector.core.report;
 
+import org.inspector.utils.color.AnsiColor;
 import org.jspecify.annotations.NonNull;
 
 import java.nio.file.Path;
@@ -42,7 +43,9 @@ public record Issue(
 
         if (path != null) {
             sb.append("File        : ")
+                    .append(AnsiColor.BLUE.code())
                     .append(path)
+                    .append(AnsiColor.RESET)
                     .append('\n');
         }
 

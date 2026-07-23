@@ -7,6 +7,8 @@ import org.inspector.core.analyzers.endpoints.DuplicateEndpoint;
 import org.inspector.core.analyzers.endpoints.MissingRequestValidation;
 import org.inspector.core.analyzers.endpoints.QualityController;
 import org.inspector.core.report.Issue;
+import org.inspector.utils.color.AnsiColor;
+import org.inspector.utils.color.PrintColorUtil;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Parameters;
@@ -29,6 +31,9 @@ public class Main implements Runnable {
     @Option(names = {"-c", "--count"})
     boolean count;
 
+    @Option(names = {"-a", "--all"})
+    boolean all;
+
     @Option(names = {"-e", "--endpoint"})
     boolean endpoint;
 
@@ -36,8 +41,7 @@ public class Main implements Runnable {
 
     @Override
     public void run() {
-
-        System.out.println("""
+        System.out.println(PrintColorUtil.colorize("""
 
 
                         .-===================-.       \s
@@ -60,14 +64,18 @@ public class Main implements Runnable {
                        .=======================.      \s
                         .-===================-.       \s
                 
-                    Analisando seu projeto Spring ...
+                    Analyzing your Spring project ...
 
-                """);
+                """, AnsiColor.GREEN));
 
         try {
             new CodebaseAnalyzer(Path.of(path)).initAnalyzer();
         } catch (IOException ex) {
             ex.printStackTrace();
+        }
+
+        if (all) {
+            count = endpoint = true;
         }
 
         if (count) {
