@@ -4,6 +4,9 @@ import com.github.javaparser.ParserConfiguration;
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
+import com.github.javaparser.ast.body.RecordDeclaration;
+import com.github.javaparser.ast.body.TypeDeclaration;
+import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import org.inspector.core.ProjectScanner;
 import org.inspector.core.analyzers.data.ControllerMetadata;
 import org.inspector.core.analyzers.data.MethodMetaData;
@@ -27,22 +30,28 @@ public class CodebaseAnalyzer {
         javaClasses.forEach(path -> {
             try {
                 CompilationUnit compilationUnit = StaticJavaParser.parse(path);
-                compilationUnit.findAll(ClassOrInterfaceDeclaration.class)
-                        .forEach(c -> {
-                            projectIndex.mapClass(c.getNameAsString(), path, c);
+                compilationUnit.findAll(TypeDeclaration.class)
+                        .forEach(td -> {
+                            if (td instanceof ClassOrInterfaceDeclaration c) {
+                                projectIndex.mapClass(c.getNameAsString(), path, c);
 
-                            c.getAnnotations().forEach(annotationExpr -> {
-                                String formatedAnnotation = annotationExpr.getName().toString();
-                                projectIndex.addClass(formatedAnnotation, c);
-                            });
-
-                            c.getMethods().forEach(methodDeclaration -> {
-                                methodDeclaration.getAnnotations().forEach(annotationExpr -> {
+                                c.getAnnotations().forEach(annotationExpr -> {
                                     String formatedAnnotation = annotationExpr.getName().toString();
-                                    projectIndex.addMethod(formatedAnnotation, new MethodMetaData(c, methodDeclaration));
+                                    projectIndex.addClass(formatedAnnotation, c);
                                 });
-                            });
+
+                                c.getMethods().forEach(methodDeclaration -> {
+                                    methodDeclaration.getAnnotations().forEach(annotationExpr -> {
+                                        String formatedAnnotation = annotationExpr.getName().toString();
+                                        projectIndex.addMethod(formatedAnnotation, new MethodMetaData(c, methodDeclaration));
+                                    });
+                                });
+                            }
+                            if (td instanceof RecordDeclaration r) {
+                                projectIndex.mapRecord(r.getNameAsString(), r);
+                            }
                         });
+
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }

@@ -11,6 +11,8 @@ import org.inspector.core.report.BeanType;
 import org.inspector.core.report.Issue;
 import org.inspector.core.report.IssueType;
 import org.inspector.core.report.Severity;
+import org.inspector.utils.color.AnsiColor;
+import org.inspector.utils.color.PrintColorUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,14 +31,18 @@ public class MissingRequestValidation implements Analyzer {
                 MethodDeclaration method = endpointMetadata.getDeclaration();
                 Integer line = NodeUtil.getLine(method);
                 for (Parameter parameter : method.getParameters()) {
-                    boolean isRequestBody = false, isValid = false;
+                    boolean isRequestBody = false, isValid = false, isJavaCLass = false;
 
                     if (parameter.getAnnotationByName("RequestBody").isPresent()) isRequestBody = true;
 
                     if (parameter.getAnnotationByName("Valid").isPresent() ||
                         parameter.getAnnotationByName("Validated").isPresent()) isValid = true;
 
-                    if (isRequestBody && !isValid) {
+                    if (!projectIndex.containsClass(parameter.getType().asString()) && !projectIndex.containsRecord(parameter.getType().asString())) {
+                        isJavaCLass = true;
+                    }
+
+                    if (isRequestBody && !isValid && !isJavaCLass) {
                         issues.add(new Issue(Severity.WARNING,
                                 IssueType.MISSING_REQUEST_VALIDATION,
                                 BeanType.CONTROLLER,
@@ -44,11 +50,23 @@ public class MissingRequestValidation implements Analyzer {
                                 "Method parameter is not being validated.",
                                 line,
                                 controllerMetadata.getPath(),
-                                "Add @Valid before the parameter"));
+                                "Add @Valid before the parameter " + PrintColorUtil.colorize(parameter.getNameAsString(), AnsiColor.RED)));
                     }
                 }
             });
         });
+
+        if (issues.isEmpty()) {
+            issues.add(new Issue(Severity.INFO,
+                    IssueType.MISSING_REQUEST_VALIDATION,
+                    BeanType.CONTROLLER,
+                    "Missing Request Validation",
+                    "Method parameters it's OK",
+                    null,
+                    null,
+                    null));
+        }
+
         return issues;
     }
 }

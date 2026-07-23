@@ -23,6 +23,7 @@ public class AnalysisResult {
         printLine("=", 50);
         System.out.println("\tAnalysis: " + this.name);
         printLine("=", 50);
+        System.out.println();
         sendReport(this.issues);
         printLine("=", 50);
         System.out.println("\tDuration: " + this.duration.toMillis() + " ms");
