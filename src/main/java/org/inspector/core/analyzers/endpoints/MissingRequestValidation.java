@@ -27,23 +27,25 @@ public class MissingRequestValidation implements Analyzer {
         controllers.values().forEach(controllerMetadata -> {
             controllerMetadata.getEndpoints().forEach(endpointMetadata -> {
                 MethodDeclaration method = endpointMetadata.getDeclaration();
-                boolean isRequestBody = false, isValid = false;
                 Integer line = NodeUtil.getLine(method);
                 for (Parameter parameter : method.getParameters()) {
-                    if (parameter.getAnnotationByName("RequestBody").isPresent()) isRequestBody = true;
-                    if (parameter.getAnnotationByName("Valid").isPresent() ||
-                    parameter.getAnnotationByName("Validated").isPresent()) isValid = true;
-                }
+                    boolean isRequestBody = false, isValid = false;
 
-                if (isRequestBody && !isValid) {
-                    issues.add(new Issue(Severity.WARNING,
-                            IssueType.MISSING_REQUEST_VALIDATION,
-                            BeanType.CONTROLLER,
-                            "Missing Request Validation",
-                            "Method parameter is not being validated.",
-                            line,
-                            controllerMetadata.getPath(),
-                            "Add @Valid before the parameter"));
+                    if (parameter.getAnnotationByName("RequestBody").isPresent()) isRequestBody = true;
+
+                    if (parameter.getAnnotationByName("Valid").isPresent() ||
+                        parameter.getAnnotationByName("Validated").isPresent()) isValid = true;
+
+                    if (isRequestBody && !isValid) {
+                        issues.add(new Issue(Severity.WARNING,
+                                IssueType.MISSING_REQUEST_VALIDATION,
+                                BeanType.CONTROLLER,
+                                "Missing Request Validation",
+                                "Method parameter is not being validated.",
+                                line,
+                                controllerMetadata.getPath(),
+                                "Add @Valid before the parameter"));
+                    }
                 }
             });
         });

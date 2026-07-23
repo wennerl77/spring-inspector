@@ -3,8 +3,10 @@ package org.inspector.core.analyzers;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.expr.AnnotationExpr;
 import com.github.javaparser.ast.expr.Expression;
+import org.inspector.core.analyzers.data.ClassMetadata;
 import org.inspector.core.analyzers.data.ControllerMetadata;
 import org.inspector.core.analyzers.data.MethodMetaData;
+import org.inspector.core.analyzers.data.ServiceMetadata;
 import org.inspector.core.analyzers.endpoints.EndpointMetadata;
 import org.inspector.core.analyzers.utils.ValidateAnnotationUtil;
 
@@ -14,38 +16,34 @@ import java.util.*;
 public class ProjectIndex {
     private final Map<String, List<ClassOrInterfaceDeclaration>> classesByAnnotation;
     private final Map<String, List<MethodMetaData>> methodsByAnnotation;
-    private final List<ClassOrInterfaceDeclaration> classes;
+    private final Set<ClassMetadata> classes;
 
     private final Map<String, ControllerMetadata> controllers;
+    private final Map<String, ServiceMetadata> services;
 
     public ProjectIndex() {
         this.classesByAnnotation = new HashMap<>();
         this.methodsByAnnotation = new HashMap<>();
-        this.classes = new ArrayList<>();
+        this.classes = new HashSet<>();
         this.controllers = new HashMap<>();
+        this.services = new HashMap<>();
     }
 
-    public void addController (String name, Path path, ClassOrInterfaceDeclaration clazz) {
+    public void mapClass (String name, Path path, ClassOrInterfaceDeclaration clazz) {
+        this.addClass(path, clazz);
+        this.addController(name, path, clazz);
+        this.addService(name, path, clazz);
+    }
+
+    // Métodos de mapeamento de classe - Begin
+
+    private void addController (String name, Path path, ClassOrInterfaceDeclaration clazz) {
         ControllerMetadata controllerMetadata = new ControllerMetadata(clazz, path);
 
         if (controllerMetadata.isAvaliable()) {
             controllerMetadata.getClazz().getMethods().forEach(method -> {
                 EndpointMetadata pseudoEndpoint = new EndpointMetadata(method);
                 if (pseudoEndpoint.isAvaliable()) {
-                    Optional<AnnotationExpr> annotationExpr = controllerMetadata.getClazz().getAnnotationByName("RequestMapping");
-                    Optional<Expression> expression = Optional.empty();
-                    if (annotationExpr.isPresent()) {
-                        expression = ValidateAnnotationUtil.getValueByAnnotation(
-                                annotationExpr.get(),
-                                new String[]{"value", "path"}
-                        );
-                    }
-
-                    // Adiciona Endpoint
-                    expression.ifPresent(value -> {
-                        pseudoEndpoint.setClassPath(value.toString());
-                        pseudoEndpoint.setOwner(controllerMetadata);
-                    });
                     controllerMetadata.addEndpoint(pseudoEndpoint);
                 }
             });
@@ -53,8 +51,26 @@ public class ProjectIndex {
         }
     }
 
+    private void addService (String name, Path path, ClassOrInterfaceDeclaration clazz) {
+        ServiceMetadata serviceMetadata = new ServiceMetadata(clazz, path);
+
+        if (serviceMetadata.isAvaliable()) {
+            this.services.put(name, serviceMetadata);
+        }
+    }
+
+    private void addClass (Path path, ClassOrInterfaceDeclaration clazz) {
+        this.classes.add(new ClassMetadata(path, clazz));
+    }
+
+    // Métodos de mapeamento de classe - End
+
     public Map<String, ControllerMetadata> getControllers() {
         return controllers;
+    }
+
+    public Map<String, ServiceMetadata> getServices() {
+        return services;
     }
 
     public void addMethod(String annotation, MethodMetaData methodMetaData) {
@@ -62,13 +78,9 @@ public class ProjectIndex {
         this.methodsByAnnotation.get(annotation).add(methodMetaData);
     }
 
-    public void addClass(String annotation, ClassOrInterfaceDeclaration clazz) {
+    public void addClass (String annotation, ClassOrInterfaceDeclaration clazz) {
         this.classesByAnnotation.computeIfAbsent(annotation, k -> new ArrayList<>());
         this.classesByAnnotation.get(annotation).add(clazz);
-    }
-
-    public void addClass(ClassOrInterfaceDeclaration clazz) {
-        this.classes.add(clazz);
     }
 
     public List<ClassOrInterfaceDeclaration> getClassesByAnnotations(String ...anntotations) {
@@ -77,13 +89,5 @@ public class ProjectIndex {
             if (classesByAnnotation.containsKey(annotation)) list.addAll(classesByAnnotation.get(annotation));
         }
         return list;
-    }
-
-    public List<MethodMetaData> getAnnotationsOfMethod (String annotation) {
-        return methodsByAnnotation.get(annotation);
-    }
-
-    public List<ClassOrInterfaceDeclaration> getClasses() {
-        return classes;
     }
 }

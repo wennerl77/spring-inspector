@@ -1,11 +1,15 @@
 package org.inspector.core.analyzers.data;
 
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
+import com.github.javaparser.ast.expr.AnnotationExpr;
+import com.github.javaparser.ast.expr.Expression;
 import org.inspector.core.analyzers.endpoints.EndpointMetadata;
+import org.inspector.core.analyzers.utils.ValidateAnnotationUtil;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class ControllerMetadata implements MetadataAvaliable{
     private ClassOrInterfaceDeclaration clazz;
@@ -19,6 +23,21 @@ public class ControllerMetadata implements MetadataAvaliable{
     }
 
     public void addEndpoint (EndpointMetadata endpointMetadata) {
+        Optional<AnnotationExpr> annotationExpr = this.getClazz().getAnnotationByName("RequestMapping");
+        Optional<Expression> expression = Optional.empty();
+        if (annotationExpr.isPresent()) {
+            expression = ValidateAnnotationUtil.getValueByAnnotation(
+                    annotationExpr.get(),
+                    new String[]{"value", "path"}
+            );
+        }
+
+        // Adiciona Endpoint
+        expression.ifPresent(value -> {
+            endpointMetadata.setClassPath(value.toString());
+            endpointMetadata.setOwner(this);
+        });
+
         this.endpoints.add(endpointMetadata);
     }
 

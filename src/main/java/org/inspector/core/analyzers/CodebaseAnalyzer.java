@@ -29,7 +29,7 @@ public class CodebaseAnalyzer {
                 CompilationUnit compilationUnit = StaticJavaParser.parse(path);
                 compilationUnit.findAll(ClassOrInterfaceDeclaration.class)
                         .forEach(c -> {
-                            projectIndex.addController(c.getNameAsString(), path, c);
+                            projectIndex.mapClass(c.getNameAsString(), path, c);
 
                             c.getAnnotations().forEach(annotationExpr -> {
                                 String formatedAnnotation = annotationExpr.getName().toString();
