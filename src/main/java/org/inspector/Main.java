@@ -5,6 +5,7 @@ import org.inspector.core.analyzers.CodebaseAnalyzer;
 import org.inspector.core.analyzers.beans.CountAnaliser;
 import org.inspector.core.analyzers.endpoints.DuplicateEndpoint;
 import org.inspector.core.analyzers.endpoints.MissingRequestValidation;
+import org.inspector.core.analyzers.endpoints.QualityController;
 import org.inspector.core.report.Issue;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
@@ -69,12 +70,15 @@ public class Main implements Runnable {
             ex.printStackTrace();
         }
 
-        Instant instantNow = Instant.now();
-        if (count) analysisResult.add(new AnalysisResult("Bean Counting", (new CountAnaliser().analyze()), Duration.between(instantNow, Instant.now())));
-        instantNow = Instant.now();
-        if (count) analysisResult.add(new AnalysisResult("Valid not set", (new MissingRequestValidation().analyze()), Duration.between(instantNow, Instant.now())));
-        instantNow = Instant.now();
-        if (endpoint) analysisResult.add(new AnalysisResult("Duplicate Endpoints", (new DuplicateEndpoint().analyze()), Duration.between(instantNow, Instant.now())));
+        if (count) {
+            analysisResult.add(new AnalysisResult("Bean Counting", new CountAnaliser()));
+            analysisResult.add(new AnalysisResult("Valid not set", new MissingRequestValidation()));
+        }
+
+        if (endpoint) {
+            analysisResult.add(new AnalysisResult("Duplicate Endpoints", new DuplicateEndpoint()));
+            analysisResult.add(new AnalysisResult("Quality Endpoints", new QualityController()));
+        }
 
         analysisResult.forEach(AnalysisResult::print);
     }
